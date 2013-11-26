@@ -1,0 +1,4 @@
+out/
+*.min.js
+*.all.js
+.DS_Store
