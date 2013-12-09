@@ -25,7 +25,7 @@ define([], function () {
      */
     function Clock(t) {
         if (!t)
-            t = performance.now;
+            t = function () { return performance.now(); };
 
         var timeStart = t();
         var timeNow = 0;
