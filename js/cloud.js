@@ -32,14 +32,14 @@ define([], function() {
         }
 
         /**
-         * All particle dataView handled by the Cloud is organized in a single Float32Array, with each particle occupying
-         * Particle.ELEMENT_AMOUNT elements of dataView in the array. How those elements are used is described in the
+         * All particle data handled by the Cloud is organized in a single Float32Array, with each particle occupying
+         * Particle.ELEMENT_AMOUNT elements of data in the array. How those elements are used is described in the
          * documentation for Particle.
          *
-         * This method exists solely in order to allow for acquiring particle dataView and uploading it to a WebGL vertex
+         * This method exists solely in order to allow for acquiring particle data and uploading it to a WebGL vertex
          * buffer.
          *
-         * @returns {Float32Array} View into cloud particle dataView array.
+         * @returns {Float32Array} View into cloud particle data array.
          */
         this.getData = function () {
             return data.subarray(0, particleAmount * Particle.ELEMENT_AMOUNT);
@@ -69,7 +69,7 @@ define([], function() {
     /**
      * A cloud particle.
      *
-     * The data which make up the particle is stored in the references array, dataView. The array needs to have at least
+     * The data which make up the particle is stored in the referenced array, dataView. The array needs to have at least
      * Particle.ELEMENT_AMOUNT elements in order for a particle to be successfully created.
      *
      * @param {Float32Array} dataView - A reference to the array which stores the particle's data.
