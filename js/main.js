@@ -2,10 +2,57 @@ require.config({
     baseUrl: "js"
 });
 
-require([], function () {
+require(["webgl", "utilities", "cloud", "analyzer"], function (WebGL, Utilities, Cloud, Analyzer) {
     var canvas = document.getElementById("webgl-canvas");
+    var gl = WebGL.getContextFrom(canvas);
 
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    gl.viewport(0, 0, canvas.width, canvas.height);
 
+    var particleProgram = WebGL.createProgramFrom(gl,
+        Utilities.GET("resources/shader.vert"),
+        Utilities.GET("resources/shader.frag")
+    );
+    gl.useProgram(particleProgram);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
+    var textureSize = WebGL.getValidTextureSizeFrom(gl, canvas);
+    var fboBuffer = new WebGL.FBOBuffer(gl, 2, textureSize);
+
+    var vboBuffer = new WebGL.VBOBuffer(gl, 1, [
+        new WebGL.VertexAttribute(gl.getAttribLocation(particleProgram, "a_Position"), 4),
+        new WebGL.VertexAttribute(gl.getAttribLocation(particleProgram, "a_Color"), 4)
+    ]);
+
+    var particleAmount = 256;
+    var presenter = document.getElementById("presenter");
+
+    var cloud = new Cloud.Cloud(particleAmount, particleAmount);
+    var analyzer = new Analyzer.Analyzer();
+
+    var clock = new Utilities.Clock();
+    var updateRate = 0, time = 0;
+    (function tick() {
+        time = clock.getTimeElapsed();
+        if (time <= 10.0) {
+            requestAnimationFrame(tick);
+
+            cloud.update(time);
+            vboBuffer.upload(cloud.getData());
+
+            vboBuffer.enable();
+            //fboBuffer.startCapture();
+            gl.drawArrays(gl.POINTS, 0, particleAmount);
+            //fboBuffer.stopCapture();
+            vboBuffer.disable();
+
+            analyzer.push(clock.getInterval());
+        } else {
+            var report = analyzer.generateReport();
+            presenter.innerHTML = "<p><b>Avg:</b> " + report.average + "</p><p><b>Stdev:</b> " + report.standardDeviation + "</p>";
+        }
+    })();
 
     /*var reports = benchmarkCloudsIn(canvas);
 
