@@ -60,9 +60,8 @@ define([], function() {
          * @param time - Global time.
          */
         this.update = function (time) {
-            particles.forEach(function (particle) {
-                particle.update(time);
-            });
+            for (var i = particleAmount; i--;)
+                particles[i].update(time);
         };
     }
 
@@ -78,7 +77,8 @@ define([], function() {
     function Particle(dataView) {
         this.dataView = dataView;
 
-        this._speed = (Math.random() * 9.0) + 1.0;
+        this._speed = (Math.random() * 3.0) + 1.0;
+        this._intensity = Math.random();
         this._offsetX = Math.random() * Math.PI * 2;
         this._offsetY = Math.random() * Math.PI * 2;
         this._offsetZ = Math.random() * Math.PI * 2;
@@ -142,9 +142,9 @@ define([], function() {
      */
     Particle.prototype.update = function (time) {
         this.setPosition(
-            Math.sin(this._offsetX + time * this._speed),
-            Math.cos(this._offsetY + time * this._speed),
-            Math.sin(this._offsetZ + time * this._speed)
+            Math.sin(this._offsetX + time * this._speed) * this._intensity,
+            Math.cos(this._offsetY + time * this._speed) * this._intensity,
+            Math.sin(this._offsetZ + time * this._speed) * this._intensity
         );
     };
 
