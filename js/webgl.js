@@ -180,8 +180,8 @@ define([], function () {
         var activeVertexBuffer = 0;
         
         function getTotalAttributeSize() {
-            return vertexAttributes.reduce(function(acc, elem) {
-                return acc + elem.size;
+            return vertexAttributes.reduce(function(a, b) {
+                return a.size + b.size;
             });
         }
     
