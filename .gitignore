@@ -1,4 +1,2 @@
-out/
-*.min.js
-*.all.js
+.idea/
 .DS_Store
