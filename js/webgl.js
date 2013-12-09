@@ -1,4 +1,45 @@
 define([], function () {
+
+    /**
+     * Create new WebGL shader program.
+     *
+     * @param {WebGLObject} gl - WebGL context reference.
+     * @param {string} sourceVertexShader - Vertex shader source.
+     * @param {string} sourceFragmentShader - Fragment shader source.
+     * @returns {WebGLProgram} Created WebGL program.
+     * @throws {string} Description of error.
+     */
+    function createProgramFrom(gl, sourceVertexShader, sourceFragmentShader) {
+
+        return linkProgram(
+            compileShader(sourceVertexShader, gl.VERTEX_SHADER),
+            compileShader(sourceFragmentShader, gl.FRAGMENT_SHADER)
+        );
+
+        function compileShader(source, type) {
+            var s = gl.createShader(type);
+            gl.shaderSource(s, source);
+            gl.compileShader(s);
+
+            if (!gl.getShaderParameter(s, gl.COMPILE_STATUS))
+                throw "Shader compile error '" + gl.getShaderInfoLog(s) + "'.";
+
+            return s;
+        }
+
+        function linkProgram(vertexShader, fragmentShader) {
+            var p = gl.createProgram();
+            gl.attachShader(p, vertexShader);
+            gl.attachShader(p, fragmentShader);
+            gl.linkProgram(p);
+
+            if (!gl.getProgramParameter(p, gl.LINK_STATUS))
+                throw "Unable to link shader program.";
+
+            return p;
+        }
+    }
+
     /**
      * Acquire valid WebGL context.
      *
@@ -30,7 +71,7 @@ define([], function () {
      *
      * @param {WebGLObject] gl - WebGL context.
      * @param {object} dimensions - Object with width and height attribute.
-     * @returns {object} Object with valid width and height attribute.
+     * @returns {number} Valid texture size.
      */
     function getValidTextureSizeFrom(gl, dimensions) {
         var threshold = (dimensions.width > dimensions.height)
@@ -45,7 +86,7 @@ define([], function () {
         if (size > maxSize)
             size = maxSize;
 
-        return { width: size, height: size };
+        return size;
     }
 
     /**
@@ -55,6 +96,7 @@ define([], function () {
      * @param {WebGLObject} gl - WebGL context.
      * @param {number} n - Amount of off-screen buffers to use.
      * @param {number} bufferSize - The, power of 2, pixel size of a side of a frame buffer texture.
+     * @constructor
      */
     function FBOBuffer(gl, n, bufferSize) {
 
@@ -127,6 +169,7 @@ define([], function () {
      * @param {WebGLObject} gl - WebGL context.
      * @param {number} n - Amount of vertex buffer objects to use.
      * @param {VertexAttribute[]} vertexAttributes - Vertex attributes identifying uploaded data.
+     * @param constructor
      */
     function VBOBuffer(gl, n, vertexAttributes) {
 
@@ -207,6 +250,7 @@ define([], function () {
     }
 
     return {
+        createProgramFrom: createProgramFrom,
         getContextFrom: getContextFrom,
         getValidTextureSizeFrom: getValidTextureSizeFrom,
         FBOBuffer: FBOBuffer,

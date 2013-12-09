@@ -30,18 +30,38 @@ define(function (require) {
 
             var validatedSize = WebGL.getValidTextureSizeFrom(gl, size);
             var msg = size.width + "x" + size.height + " became "
-                + validatedSize.width + "x" + validatedSize.height + ".";
+                + validatedSize + "x" + validatedSize + ".";
             
             assert.ok(isValid(validatedSize), msg);
         
             function isValid(size) {
 
-                return (size.width > 0) && (size.width === size.height) && isPowerOf2(size.width);
+                return (size > 0) && isPowerOf2(size.width);
                 
                 function isPowerOf2(x) {
-                    return (size.width & (size.width - 1)) === 0;
+                    return (x & (x - 1)) === 0;
                 }
             }
         }
+    });
+    
+    QUnit.test("Create WebGL program", function (assert) {
+        var sourceVertexShader =
+              "attribute vec4 a_Position;"
+            + "void main () {"
+            + "  gl_Position = a_Position;"
+            + "}";
+        
+        var sourceFragmentShader =
+              "precision mediump float;"
+            + "void main() {"
+            + "  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);"
+            + "}";
+        
+        var canvas = document.getElementById("test-canvas");
+        var gl = WebGL.getContextFrom(canvas);
+        
+        var program = WebGL.createProgramFrom(gl, sourceVertexShader, sourceFragmentShader);
+        assert.ok((program instanceof WebGLProgram), "Created valid WebGL program.");
     });
 });
