@@ -4,7 +4,10 @@
     });
 
     var tests = [
-        "tests/test_cloud"
+        "tests/test_analyzer",
+        "tests/test_cloud",
+        "tests/test_utilities",
+        "tests/test_webgl"
     ];
     require(tests, QUnit.start);
 }());
