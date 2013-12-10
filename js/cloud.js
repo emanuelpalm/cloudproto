@@ -45,6 +45,13 @@ define([], function() {
             return data.subarray(0, particleAmount * Particle.ELEMENT_AMOUNT);
         };
 
+		/**
+		 * @returns {number} The amount of particles in cloud.
+		 */
+		this.getParticleAmount = function () {
+			return particleAmount;
+		}
+
         /**
          * All particle objects populating the cloud.
          *
