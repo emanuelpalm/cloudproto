@@ -91,10 +91,10 @@ define([], function() {
         this._offsetZ = Math.random() * Math.PI * 2;
 
         this.setColor(
-            0.2 + 0.5 * Math.random(),
-            0.1 + 0.1 * Math.random(),
-            0.1 + 0.9 * Math.random(),
-            0.3 + 0.7 * Math.random()
+            0.4 + 0.3 * Math.random(),
+            0.2 + 0.1 * Math.random(),
+            0.2 + 0.8 * Math.random(),
+            1.0
         );
         this.setPosition(0, 0, 0);
     }
