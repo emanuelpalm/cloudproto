@@ -7,12 +7,15 @@ require(["webgl", "analyzer", "benchmark"], function (WebGL, Analyzer, Benchmark
 	var gl = initializeWebGL();
 	var reports = [];
 
-    var benchmarker = new Benchmark.Benchmarker(gl, 10.0);
-    benchmarker.run(benchmarkEnd);
+    var benchmarker = new Benchmark.Benchmarker(gl);
+    benchmarker.setVBON(2);
+    benchmarker.setFBOTextureN(2);
+    benchmarker.runCalibrating(benchmarkEnd, 0.05, 512);
+    //benchmarker.runStatic(benchmarkEnd, 5.0, 1024);
 	
-	function benchmarkEnd(report) {
-		reports.push(report);
-		console.log(reports);
+	function benchmarkEnd(amt, time) {
+		console.log(amt);
+        console.log(time);
 	}
 
 	function initializeWebGL() {

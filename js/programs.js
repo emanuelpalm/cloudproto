@@ -38,7 +38,7 @@ define(["webgl"], function (WebGL) {
         /**
          * @param {number} n - Target amount of VBOs to use. Has to be between 1 and 8.
          */
-        this.setVBOBufferN = function (n) {
+        this.setVBON = function (n) {
             vboBuffer.setN(n);
         };
 	}
@@ -97,19 +97,19 @@ define(["webgl"], function (WebGL) {
             vboBuffer.enable();
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
             vboBuffer.disable();
-		}
+		};
 
         /**
          * @param {number} n - Target amount of FBO textures to use. Has to be between 1 and 8.
          */
-        this.setFBOBufferN = function (n) {
+        this.setFBOTextureN = function (n) {
             fboBuffer.setN(n);
         };
 
         /**
          * @param {number} n - Target amount of VBOs to use. Has to be between 1 and 8.
          */
-        this.setVBOBufferN = function (n) {
+        this.setVBON = function (n) {
             vboBuffer.setN(n);
         };
 	}
