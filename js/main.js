@@ -2,26 +2,30 @@ require.config({
     baseUrl: "js"
 });
 
-require(["webgl", "analyzer", "benchmark"], function (WebGL, Analyzer, Benchmark) {
+require(["webgl", "analyzer", "benchmark", "console"], function (WebGL, Analyzer, Benchmark, Console) {
 
-    var presenter = document.getElementById("presenter");
+    var console = new Console.Console(document.getElementById("presenter"), 8);
 	var gl = initializeWebGL();
 	var reports = [];
 
-    presenter.innerHTML += "Initializing cloud ...";
+    console.addRow("Initializing cloud ...");
     var benchmarker = new Benchmark.Benchmarker(gl);
 
     benchmarker.setVBON(2);
     benchmarker.setFBOTextureN(2);
 
-    presenter.innerHTML += " done!<br />Running cloud calibration ...";
-    benchmarker.runCalibrating(benchmarkEnd, 0.05, 1024);
-    //benchmarker.runStatic(benchmarkEnd, 5.0, 1024);
-	
+    console.setRow(0, "Initializing cloud ... done!");
+
+    document.onmousedown = function () {
+        console.addRow("Running cloud calibration ...");
+        benchmarker.runCalibrating(benchmarkEnd, 0.05, 1024);
+        //benchmarker.runStatic(benchmarkEnd, 5.0, 1024);
+    };
+
 	function benchmarkEnd(amt, time) {
-        presenter.innerHTML += " done!<br />Calibration converged at " + amt + " particles.";
-		console.log(amt);
-        console.log(time);
+        console.setRow(0, "Running cloud calibration ... done!");
+        console.addRow("Calibration took " + time.toFixed(2) + " seconds.");
+        console.addRow("Calibration converged at " + amt + " particles.");
 	}
 
 	function initializeWebGL() {
