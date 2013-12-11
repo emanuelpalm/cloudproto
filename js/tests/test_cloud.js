@@ -33,7 +33,7 @@ define(function(require) {
         assert.ok((data[6] >= 0.0 && data[6] <= 1.0), "data[6] (B) - Is a valid color.");
         assert.ok((data[7] >= 0.0 && data[7] <= 1.0), "data[7] (A) - Is a valid color.");
 
-        cloud.addParticle();
+        cloud.setParticleAmount(2);
         data = cloud.getData();
 
         assert.equal(cloud.getParticles().length, 2, "Cloud now has 2 particles.");
