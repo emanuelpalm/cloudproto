@@ -11,24 +11,18 @@ define([], function() {
         var data = new Float32Array(maxParticleAmount * Particle.ELEMENT_AMOUNT);
         var particles = new Array(maxParticleAmount);
         var particleAmount = 0;
+        initializeParticles();
 
-        while (initialParticleAmount--)
-            addParticle();
+        function initializeParticles() {
+            for (var i = maxParticleAmount; i--;) {
+                var offsetBegin = (particleAmount * Particle.ELEMENT_AMOUNT);
+                var offsetEnd = offsetBegin + Particle.ELEMENT_AMOUNT;
 
-        /**
-         * Adds one random particle to cloud. If the amount of particles exceeds the maximum amount given at Cloud
-         * creation, the method fails and throws an exception.
-         */
-        this.addParticle = addParticle;
+                var dataView = data.subarray(offsetBegin, offsetEnd);
 
-        function addParticle() {
-            var offsetBegin = (particleAmount * Particle.ELEMENT_AMOUNT);
-            var offsetEnd = offsetBegin + Particle.ELEMENT_AMOUNT;
-
-            var dataView = data.subarray(offsetBegin, offsetEnd);
-
-            particles[particleAmount] = new Particle(dataView);
-            particleAmount++;
+                particles[i] = new Particle(dataView);
+                particleAmount++;
+            }
         }
 
         /**
@@ -59,6 +53,16 @@ define([], function() {
          */
         this.getParticles = function () {
             return particles.slice(0, particleAmount);
+        };
+
+        /**
+         * @param {number} amount - Amount of particles in cloud. Has to be a number between 0 and maxParticleAmount.
+         */
+        this.setParticleAmount = function (amount) {
+            if (amount <= 0 || amount > maxParticleAmount)
+                throw "Given particle amount of " + amount + " is not in a valid range.";
+
+            particleAmount = amount;
         };
 
         /**
