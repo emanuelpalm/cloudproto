@@ -20,7 +20,7 @@ define(["webgl", "utilities", "cloud", "analyzer", "programs"],
 			);
 
             var particleMax = 4194304;
-			var cloud = new Cloud.Cloud(16, particleMax);
+			var cloud = new Cloud.Cloud(0, particleMax);
 
             /**
              * Run benchmark.
@@ -84,7 +84,7 @@ define(["webgl", "utilities", "cloud", "analyzer", "programs"],
                         thresholdStreak = 0;
                     }
 
-                    if (thresholdStreak >= 4) {
+                    if (thresholdStreak >= 60) {
                         callback(particleAmount, clock.getTimeElapsed());
 
                     } else {
