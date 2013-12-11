@@ -58,6 +58,13 @@ define([], function () {
     };
 
     /**
+     * @returns {string} Text contents of top row.
+     */
+    Terminal.prototype.getTop = function () {
+        return this.container.childNodes[0].innerHTML;
+    };
+
+    /**
      * @param {number} index - Index of row to set.
      * @param {string} text - Text to set.
      */
@@ -66,7 +73,14 @@ define([], function () {
             throw "Terminal index " + index + " out of range.";
 
         this.container.childNodes[index].innerHTML = text;
-    }
+    };
+
+    /**
+     * @param {string} text - Text to set in top row.
+     */
+    Terminal.prototype.setTop = function (text) {
+        this.container.childNodes[0].innerHTML = text;
+    };
 
     return {
         Terminal: Terminal

@@ -2,9 +2,9 @@ require.config({
     baseUrl: "js"
 });
 
-require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyzer, Benchmark, Console) {
+require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyzer, Benchmark, Terminal) {
 
-    var terminal = new Console.Terminal(document.getElementById("terminal"), 8);
+    var terminal = new Terminal.Terminal(document.getElementById("terminal"), 8);
     var startButton = document.getElementById("startButton");
     var frameTimeReports = [];
     var relativePerformanceReports = [];
@@ -13,12 +13,12 @@ require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyze
 
 	var gl = initializeWebGL();
 
-    terminal.setRow(0, "Initializing WebGL .............. done!");
+    terminal.setTop("Initializing WebGL .............. done!");
     terminal.addRow("Initializing benchmarker ........");
 
     var benchmarker = new Benchmark.Benchmarker(gl);
 
-    terminal.setRow(0, "Initializing benchmarker ........ done!");
+    terminal.setTop("Initializing benchmarker ........ done!");
     terminal.addRow("Press START to start the Cloud Benchmark Suite.");
 
     startButton.style.visibility = "visible";
@@ -30,7 +30,7 @@ require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyze
     };
 
 	function benchmarkEnd(amt, time) {
-        terminal.setRow(0, "Running cloud calibration ....... done!");
+        terminal.setTop("Running cloud calibration ....... done!");
 
         relativePerformanceReports.push(amt);
         terminal.addRow("Calibration took " + time.toFixed(2) + " seconds.");
