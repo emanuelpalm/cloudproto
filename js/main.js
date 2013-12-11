@@ -4,19 +4,18 @@ require.config({
 
 require(["webgl", "analyzer", "benchmark", "console"], function (WebGL, Analyzer, Benchmark, Console) {
 
-    var console = new Console.Console(document.getElementById("presenter"), 8);
+    var console = new Console.Console(document.getElementById("console"), 8);
+    var startButton = document.getElementById("startButton");
 	var gl = initializeWebGL();
 	var reports = [];
 
     console.addRow("Initializing cloud ...");
     var benchmarker = new Benchmark.Benchmarker(gl);
-
-    benchmarker.setVBON(2);
-    benchmarker.setFBOTextureN(2);
-
     console.setRow(0, "Initializing cloud ... done!");
+    startButton.style.visibility = "visible";
 
-    document.onmousedown = function () {
+    startButton.onmousedown = function () {
+        startButton.parentNode.removeChild(startButton);
         console.addRow("Running cloud calibration ...");
         benchmarker.runCalibrating(benchmarkEnd, 0.05, 1024);
         //benchmarker.runStatic(benchmarkEnd, 5.0, 1024);
@@ -35,6 +34,7 @@ require(["webgl", "analyzer", "benchmark", "console"], function (WebGL, Analyzer
 		canvas.width = canvas.clientWidth;
 		canvas.height = canvas.clientHeight;
 		gl.viewport(0, 0, canvas.width, canvas.height);
+
 		gl.clearColor(0.0, 0.0, 0.0, 1.0);
 		gl.enable(gl.BLEND);
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);

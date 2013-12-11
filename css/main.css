@@ -17,13 +17,14 @@ canvas {
     border: none;
 }
 
-#presenter {
+#console {
     position: absolute;
     top: 1em;
     left: 1em;
+    overflow: hidden;
 }
 
-#presenter div {
+#console div {
     font-family: Monaco, "Lucida Console", monospace;
     font-size: 12pt;
     border-left: 0.4em solid #fff;
@@ -33,6 +34,30 @@ canvas {
     margin-bottom: 0.2em;
 }
 
-#presenter div:first-child {
+#console div:first-child {
     opacity: 1.0;
+}
+
+#startButton {
+    visibility: hidden;
+    font-family: Monaco, "Lucida Console", monospace;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8em;
+    height: 2em;
+    margin-left: -4em;
+    margin-top: -1em;
+    background-color: #444;
+    color: #fff;
+    border:0.1em solid #aaa;
+    font-weight: bold;
+    font-size: 14pt;
+    line-height: 2em;
+    text-align: center;
+}
+
+#startButton:hover {
+    background-color: #666;
+    cursor: pointer;
 }
