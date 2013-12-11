@@ -15,14 +15,14 @@ define([], function() {
 
         function initializeParticles() {
             for (var i = maxParticleAmount; i--;) {
-                var offsetBegin = (particleAmount * Particle.ELEMENT_AMOUNT);
+                var offsetBegin = i * Particle.ELEMENT_AMOUNT;
                 var offsetEnd = offsetBegin + Particle.ELEMENT_AMOUNT;
 
                 var dataView = data.subarray(offsetBegin, offsetEnd);
 
                 particles[i] = new Particle(dataView);
-                particleAmount++;
             }
+            particleAmount = initialParticleAmount;
         }
 
         /**
@@ -44,7 +44,7 @@ define([], function() {
 		 */
 		this.getParticleAmount = function () {
 			return particleAmount;
-		}
+		};
 
         /**
          * All particle objects populating the cloud.
@@ -59,7 +59,7 @@ define([], function() {
          * @param {number} amount - Amount of particles in cloud. Has to be a number between 0 and maxParticleAmount.
          */
         this.setParticleAmount = function (amount) {
-            if (amount <= 0 || amount > maxParticleAmount)
+            if (amount < 0 || amount > maxParticleAmount)
                 throw "Given particle amount of " + amount + " is not in a valid range.";
 
             particleAmount = amount;
