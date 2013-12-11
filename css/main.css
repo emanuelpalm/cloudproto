@@ -21,6 +21,18 @@ canvas {
     position: absolute;
     top: 1em;
     left: 1em;
+}
+
+#presenter div {
+    font-family: Monaco, "Lucida Console", monospace;
+    font-size: 12pt;
+    border-left: 0.4em solid #fff;
     color: #fff;
-    font-size: 0.8em;
+    opacity: 0.50;
+    padding-left: 0.4em;
+    margin-bottom: 0.2em;
+}
+
+#presenter div:first-child {
+    opacity: 1.0;
 }
