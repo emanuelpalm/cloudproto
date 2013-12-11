@@ -19,7 +19,7 @@ define(["webgl", "utilities", "cloud", "analyzer", "programs"],
 				Utilities.GET("resources/post.frag")
 			);
 
-            var particleMax = 4194304;
+            var particleMax = 1048576;
 			var cloud = new Cloud.Cloud(0, particleMax);
 
             /**
