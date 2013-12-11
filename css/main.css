@@ -17,14 +17,14 @@ canvas {
     border: none;
 }
 
-#console {
+#terminal {
     position: absolute;
     top: 1em;
     left: 1em;
     overflow: hidden;
 }
 
-#console div {
+#terminal div {
     font-family: Monaco, "Lucida Console", monospace;
     font-size: 12pt;
     border-left: 0.4em solid #fff;
@@ -34,7 +34,7 @@ canvas {
     margin-bottom: 0.2em;
 }
 
-#console div:first-child {
+#terminal div:first-child {
     opacity: 1.0;
 }
 

@@ -56,7 +56,7 @@ define([], function () {
             try {
                 gl = canvas.getContext(names[i]);
             } catch (e) {
-                console.log("'" + names[i] + "' context not available.");
+                terminal.log("'" + names[i] + "' context not available.");
             }
         }
         if (!gl)
