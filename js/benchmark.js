@@ -1,44 +1,48 @@
 define(["webgl", "utilities", "cloud", "analyzer", "programs"],
 	function (WebGL, Utilities, Cloud, Analyzer, Programs) {
-		
-		function Suite(gl, settings) {
+
+        /**
+         * Creates a new benchmark program.
+         *
+         * @param {WebGLObject} gl - WebGL context.
+         * @param {number} runTime - Run-time, in seconds, of a single benchmark.
+         * @constructor
+         */
+		function Benchmarker(gl, runTime) {
 		
 			var cloudProgram = new Programs.Cloud(gl,
 				Utilities.GET("resources/particle.vert"),
-				Utilities.GET("resources/particle.frag"),
-				settings.vertexBufferAmount
+				Utilities.GET("resources/particle.frag")
 			);
 
-			var textureSize = WebGL.getValidTextureSizeFrom(gl, gl.canvas);
 			var postProgram = new Programs.Post(gl,
 				Utilities.GET("resources/post.vert"),
-				Utilities.GET("resources/post.frag"),
-				textureSize,
-				settings.vertexBufferAmount
+				Utilities.GET("resources/post.frag")
 			);
-			var fboBuffer = new WebGL.FBOBuffer(gl, settings.fragmentTextureAmount, textureSize);
 
-			var cloud = new Cloud.Cloud(settings.particleAmount, settings.particleAmount);
+            var particleMax = 8388608;
+			var cloud = new Cloud.Cloud(256, particleMax);
 		
-			var analyzer = new Analyzer.Analyzer();		
+			var analyzer = new Analyzer.Analyzer();
+
+            /**
+             * Run benchmark.
+             *
+             * @param {function} callback - Callback to fire when benchmark is over.
+             */
 			this.run = function (callback) {
-			
+
 				var clock = new Utilities.Clock();
-				var updateRate = 0, time = 0;
-				
+                var time = 0;
 				(function tick() {
-					time = clock.getTimeElapsed();
-					
-					if (time <= settings.time) {
+                    time = clock.getTimeElapsed();
+					if (time <= runTime) {
 						requestAnimationFrame(tick);
 
 						cloud.update(time);
-						
-						fboBuffer.startCapture();
-						cloudProgram.render(cloud);
-						fboBuffer.stopCapture();
-						
-						postProgram.render(fboBuffer.getNextBuffer());
+						postProgram.render(function () {
+                            cloudProgram.render(cloud);
+                        });
 
 						analyzer.push(clock.getInterval());
 
@@ -51,6 +55,6 @@ define(["webgl", "utilities", "cloud", "analyzer", "programs"],
 		}
 	
 		return {
-			Suite: Suite
+            Benchmarker: Benchmarker
 		};
 	});

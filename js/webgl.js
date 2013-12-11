@@ -69,14 +69,13 @@ define([], function () {
      * Determines a valid texture size from given pixel dimensions. Valid textures always square,
      * with each side a power of 2.
      *
-     * @param {WebGLObject] gl - WebGL context.
-     * @param {object} dimensions - Object with width and height attribute.
+     * @param {WebGLObject} gl - WebGL context.
      * @returns {number} Valid texture size.
      */
-    function getValidTextureSizeFrom(gl, dimensions) {
-        var threshold = (dimensions.width > dimensions.height)
-            ? dimensions.width
-            : dimensions.height;
+    function getValidTextureSizeFrom(gl) {
+        var threshold = (gl.drawingBufferWidth > gl.drawingBufferHeight)
+            ? gl.drawingBufferWidth
+            : gl.drawingBufferHeight;
 
         var size = 1;
         while (size < threshold)
@@ -94,13 +93,14 @@ define([], function () {
      * order.
      *
      * @param {WebGLObject} gl - WebGL context.
-     * @param {number} n - Amount of off-screen buffers to use.
-     * @param {number} bufferSize - The, power of 2, pixel size of a side of a frame buffer texture.
+     * @param {number} n - Initial amount of off-screen buffers to use. Has to be at least 1, and not bigger than maxN.
+     * @param {number} maxN - The amount of off-screen buffers available. Has to be at least 1.
      * @constructor
      */
-    function FBOBuffer(gl, n, bufferSize) {
+    function FBOBuffer(gl, n, maxN) {
 
         var frameBuffer = gl.createFramebuffer();
+        var frameBuffertextureSize = getValidTextureSizeFrom(gl);
         var frameBufferTextures = initializeFrameBufferTextures();
 
         var captureSlot = 0;
@@ -108,8 +108,8 @@ define([], function () {
 
         function initializeFrameBufferTextures() {
 
-            var textures = new Array(n);
-            for (var i = n; i--;)
+            var textures = new Array(maxN);
+            for (var i = maxN; i--;)
                 textures[i] = initializeFrameBufferTexture();
 
             return textures;
@@ -121,8 +121,8 @@ define([], function () {
                     gl.TEXTURE_2D,
                     0,
                     gl.RGBA,
-                    bufferSize,
-                    bufferSize,
+                    frameBuffertextureSize,
+                    frameBuffertextureSize,
                     0,
                     gl.RGBA,
                     gl.UNSIGNED_BYTE,
@@ -133,6 +133,16 @@ define([], function () {
                 return texture;
             }
         }
+
+        /**
+         * @param nn Amount of off-screen buffers to use. Has to be at least 1, and not bigger than maxN.
+         */
+        this.setN = function (nn) {
+            if (nn <= 0 || nn > maxN)
+                throw "Value " + nn + " not in valid range.";
+
+            n = nn;
+        };
 
         /**
          * Start to capture draw calls into next off-screen buffer.
@@ -146,32 +156,40 @@ define([], function () {
                 frameBufferTextures[captureSlot++ % n],
                 0
             );
-        }
+        };
 
         /**
          * Stop to capture draw calls into off-screen buffer.
          */
         this.stopCapture = function () {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        }
+        };
+
+        /**
+         * @returns {number} The texture size used when capturing frames.
+         */
+        this.getTextureSize = function () {
+            return frameBuffertextureSize;
+        };
 
         /**
          * @returns {WebGLTexture} Next buffer to render.
          */
         this.getNextBuffer = function () {
             return frameBufferTextures[releaseSlot++ % n];
-        }
+        };
     }
     
     /**
      * Manages a circle of N vertex buffer objects, into which vertex data may be uploaded in turn.
      *
      * @param {WebGLObject} gl - WebGL context.
-     * @param {number} n - Amount of vertex buffer objects to use.
+     * @param {number} n - Initial amount of vertex buffer objects to use. Has to be between 1 and maxN.
+     * @param {number} maxN - The amount of vertex buffer objects available. Has to be at least 1.
      * @param {VertexAttribute[]} vertexAttributes - Vertex attributes identifying uploaded data.
      * @param constructor
      */
-    function VBOBuffer(gl, n, vertexAttributes) {
+    function VBOBuffer(gl, n, maxN, vertexAttributes) {
 
         var WORD_SIZE = Float32Array.BYTES_PER_ELEMENT;
         var TOTAL_SIZE = getTotalAttributeSize() * WORD_SIZE;
@@ -186,13 +204,23 @@ define([], function () {
         }
     
         function initializeVertexBuffers() {
-            var vertexBuffers = new Array(n);
-            for (var i = n; i--;)
+            var vertexBuffers = new Array(maxN);
+            for (var i = maxN; i--;)
                 vertexBuffers[i] = gl.createBuffer();
 
             return vertexBuffers;
         }
-        
+
+        /**
+         * @param nn Amount of vertex buffer objects to use. Has to be at least 1, and not bigger than maxN.
+         */
+        this.setN = function (nn) {
+            if (nn <= 0 || nn > maxN)
+                throw "Value " + nn + " not in valid range.";
+
+            n = nn;
+        };
+
         /**
          * Uploads given vertex data to a suitable WebGL context buffer. The data is an array of
          * 32-bit floats, where the designated use and ordering of the floats is determined by the 

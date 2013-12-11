@@ -6,57 +6,9 @@ require(["webgl", "analyzer", "benchmark"], function (WebGL, Analyzer, Benchmark
 
 	var gl = initializeWebGL();
 	var reports = [];
-	benchmark1();
-	
-	function benchmark1() {
-		var suite = new Benchmark.Suite(gl, {
-			vertexBufferAmount: 1,
-			fragmentTextureAmount: 1,
-			particleAmount: 65536,
-			time: 60.0
-		});
-		
-		suite.run(benchmark2);
-	}
-	
-	function benchmark2(report) {
-		reports.push(report);
-	
-		var suite = new Benchmark.Suite(gl, {
-			vertexBufferAmount: 2,
-			fragmentTextureAmount: 1,
-			particleAmount: 65536,
-			time: 60.0
-		});
-		
-		suite.run(benchmark3);
-	}
-	
-	function benchmark3(report) {
-		reports.push(report);
-		
-		var suite = new Benchmark.Suite(gl, {
-			vertexBufferAmount: 1,
-			fragmentTextureAmount: 1,
-			particleAmount: 65536,
-			time: 60.0
-		});
-		
-		suite.run(benchmark4);
-	}
-	
-	function benchmark4(report) {
-		reports.push(report);
-		
-		var suite = new Benchmark.Suite(gl, {
-			vertexBufferAmount: 1,
-			fragmentTextureAmount: 2,
-			particleAmount: 65536,
-			time: 60.0
-		});
-		
-		suite.run(benchmarkEnd);
-	}
+
+    var benchmarker = new Benchmark.Benchmarker(gl, 10.0);
+    benchmarker.run(benchmarkEnd);
 	
 	function benchmarkEnd(report) {
 		reports.push(report);

@@ -1,6 +1,14 @@
 define(["webgl"], function (WebGL) {
 
-	function Cloud(gl, sourceVertexShader, sourceFragmentShader, vertexBufferAmount) {
+    /**
+     * Program for rendering a Cloud.
+     *
+     * @param {WebGLObject} gl - WebGL context.
+     * @param {string} sourceVertexShader - Vertex shader source data.
+     * @param {string} sourceFragmentShader - Fragment shader source data.
+     * @constructor
+     */
+	function Cloud(gl, sourceVertexShader, sourceFragmentShader) {
 
 		var program = WebGL.createProgramFrom(gl,
 		    sourceVertexShader,
@@ -8,11 +16,14 @@ define(["webgl"], function (WebGL) {
 		);
 		gl.useProgram(program);
 		
-		var vboBuffer = new WebGL.VBOBuffer(gl, vertexBufferAmount, [
+		var vboBuffer = new WebGL.VBOBuffer(gl, 1, 8, [
 		    new WebGL.VertexAttribute(gl.getAttribLocation(program, "a_Position"), 4),
 		    new WebGL.VertexAttribute(gl.getAttribLocation(program, "a_Color"), 4)
 		]);
-		
+
+        /**
+         * @param {Cloud} cloud - Cloud to render.
+         */
 		this.render = function (cloud) {
 			gl.clear(gl.COLOR_BUFFER_BIT);
 		
@@ -23,9 +34,24 @@ define(["webgl"], function (WebGL) {
             gl.drawArrays(gl.POINTS, 0, cloud.getParticleAmount());
             vboBuffer.disable();
 		}
+
+        /**
+         * @param {number} n - Target amount of VBOs to use. Has to be between 1 and 8.
+         */
+        this.setVBOBufferN = function (n) {
+            vboBuffer.setN(n);
+        };
 	}
 
-	function Post(gl, sourceVertexShader, sourceFragmentShader, textureSize, vertexBufferAmount) {
+    /**
+     * Post-processing program.
+     *
+     * @param {WebGLObject} gl - WebGL context.
+     * @param {string} sourceVertexShader - Vertex shader source data.
+     * @param {string} sourceFragmentShader - Fragment shader source data.
+     * @constructor
+     */
+	function Post(gl, sourceVertexShader, sourceFragmentShader) {
 
 		var program = WebGL.createProgramFrom(gl,
 		    sourceVertexShader,
@@ -37,7 +63,7 @@ define(["webgl"], function (WebGL) {
 		var u_WindowSize = gl.getUniformLocation(program, "u_WindowSize");
 		var u_TextureSize = gl.getUniformLocation(program, "u_TextureSize");
 		
-		var vboBuffer = new WebGL.VBOBuffer(gl, vertexBufferAmount, [
+		var vboBuffer = new WebGL.VBOBuffer(gl, 1, 8, [
 		    new WebGL.VertexAttribute(gl.getAttribLocation(program, "a_Position"), 2)
 		]);
 		var quad = new Float32Array([
@@ -46,21 +72,46 @@ define(["webgl"], function (WebGL) {
 			1, 1,
 			1, 0
 		]);
-		
-		this.render = function (texture) {
+
+        var fboBuffer = new WebGL.FBOBuffer(gl, 1, 8);
+
+        /**
+         * Captures and draws the contents rendered by the given callback.
+         *
+         * @param {function} captureCallback - Callback function which contains rendering calls.
+         */
+		this.render = function (captureCallback) {
+            fboBuffer.startCapture();
+            captureCallback();
+            fboBuffer.stopCapture();
+
 			gl.useProgram(program);
 			vboBuffer.upload(quad);
 
-			gl.uniform1f(u_TextureSize, textureSize);
+			gl.uniform1f(u_TextureSize, fboBuffer.getTextureSize());
 			gl.uniform2f(u_WindowSize, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-			gl.bindTexture(gl.TEXTURE_2D, texture);
+			gl.bindTexture(gl.TEXTURE_2D, fboBuffer.getNextBuffer());
 			gl.uniform1i(u_Texture, 0);
 			
             vboBuffer.enable();
             gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
             vboBuffer.disable();
 		}
+
+        /**
+         * @param {number} n - Target amount of FBO textures to use. Has to be between 1 and 8.
+         */
+        this.setFBOBufferN = function (n) {
+            fboBuffer.setN(n);
+        };
+
+        /**
+         * @param {number} n - Target amount of VBOs to use. Has to be between 1 and 8.
+         */
+        this.setVBOBufferN = function (n) {
+            vboBuffer.setN(n);
+        };
 	}
 	
 	return {

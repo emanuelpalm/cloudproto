@@ -10,8 +10,10 @@ define(function (require) {
     
     QUnit.test("Determining valid texture size from given dimensions", function (assert) {
         var gl = {
-            getParameter: function(param) { return 4096; },
-            MAX_TEXTURE_SIZE: 0
+            getParameter: function() { return 4096; },
+            MAX_TEXTURE_SIZE: 0,
+            drawingBufferWidth: 0,
+            drawingBufferHeight: 0
         };
         
         var testSizes = [
@@ -23,13 +25,15 @@ define(function (require) {
             { width:  60000, height: 20000 }
         ];
         testSizes.forEach(function(size) {
-            testIfValid(gl, size);
+            gl.drawingBufferWidth = size.width;
+            gl.drawingBufferHeight = size.height;
+            testIfValid(gl);
         });
         
-        function testIfValid(gl, size) {
+        function testIfValid(gl) {
 
-            var validatedSize = WebGL.getValidTextureSizeFrom(gl, size);
-            var msg = size.width + "x" + size.height + " became "
+            var validatedSize = WebGL.getValidTextureSizeFrom(gl);
+            var msg = gl.drawingBufferWidth + "x" + gl.drawingBufferHeight + " became "
                 + validatedSize + "x" + validatedSize + ".";
             
             assert.ok(isValid(validatedSize), msg);
