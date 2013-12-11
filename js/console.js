@@ -26,7 +26,7 @@ define([], function () {
 
         function createElementWith(text) {
             var element = document.createElement("div");
-            element.innerText = text;
+            element.innerHTML = text;
 
             return element;
         }
@@ -54,7 +54,7 @@ define([], function () {
         if (index < 0 || index >= this.rowAmount)
             throw "Console index " + index + " out of range.";
 
-        return this.container.childNodes[index].innerText;
+        return this.container.childNodes[index].innerHTML;
     };
 
     /**
@@ -65,7 +65,7 @@ define([], function () {
         if (index < 0 || index >= this.rowAmount)
             throw "Console index " + index + " out of range.";
 
-        this.container.childNodes[index].innerText = text;
+        this.container.childNodes[index].innerHTML = text;
     }
 
     return {
