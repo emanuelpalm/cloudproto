@@ -6,25 +6,35 @@ require(["webgl", "analyzer", "benchmark", "console"], function (WebGL, Analyzer
 
     var console = new Console.Console(document.getElementById("console"), 8);
     var startButton = document.getElementById("startButton");
+    var frameTimeReports = [];
+    var relativePerformanceReports = [];
+
+    console.addRow("Initializing WebGL ..............");
+
 	var gl = initializeWebGL();
-	var reports = [];
 
-    console.addRow("Initializing cloud ...");
+    console.setRow(0, "Initializing WebGL .............. done!");
+    console.addRow("Initializing benchmarker ........");
+
     var benchmarker = new Benchmark.Benchmarker(gl);
-    console.setRow(0, "Initializing cloud ... done!");
-    startButton.style.visibility = "visible";
 
+    console.setRow(0, "Initializing benchmarker ........ done!");
+    console.addRow("Press START to start the Cloud Benchmark Suite.");
+
+    startButton.style.visibility = "visible";
     startButton.onmousedown = function () {
         startButton.parentNode.removeChild(startButton);
-        console.addRow("Running cloud calibration ...");
+
+        console.addRow("Running cloud calibration .......");
         benchmarker.runCalibrating(benchmarkEnd, 0.05, 1024);
-        //benchmarker.runStatic(benchmarkEnd, 5.0, 1024);
     };
 
 	function benchmarkEnd(amt, time) {
-        console.setRow(0, "Running cloud calibration ... done!");
+        console.setRow(0, "Running cloud calibration ....... done!");
+
+        relativePerformanceReports.push(amt);
         console.addRow("Calibration took " + time.toFixed(2) + " seconds.");
-        console.addRow("Calibration converged at " + amt + " particles.");
+        console.addRow("Calibration converged at " + amt + " cloud particles.");
 	}
 
 	function initializeWebGL() {
