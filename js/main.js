@@ -3,45 +3,49 @@ require.config({
 });
 
 require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyzer, Benchmark, Terminal) {
+	
+	try {
+		var terminal = new Terminal.Terminal(document.getElementById("terminal"), 16);
+		var startButton = document.getElementById("startButton");
+		
+		var reports = {};
+		var settings = [
+			{ name: "RPI_V1_F1", v: 1, f: 1, next: benchmarkStatic },
+			{ name: "FRT_V1_F1", v: 1, f: 1, next: benchmarkStatic },
+			{ name: "FRT_V2_F1", v: 2, f: 1, next: benchmarkStatic },
+			{ name: "FRT_V1_F2", v: 1, f: 2, next: benchmarkStatic },
+			{ name: "FRT_V2_F2", v: 2, f: 2, next: benchmarkCalibrating },
+			{ name: "RPI_V2_F1", v: 2, f: 1, next: benchmarkCalibrating },
+			{ name: "RPI_V1_F2", v: 1, f: 2, next: benchmarkCalibrating },
+			{ name: "RPI_V2_F2", v: 2, f: 2, next: benchmarkEnd }
+		];
 
-    var terminal = new Terminal.Terminal(document.getElementById("terminal"), 16);
-    var startButton = document.getElementById("startButton");
-    
-    var reports = {};
-    var settings = [
-    	{ name: "RPI_V1_F1", v: 1, f: 1, next: benchmarkStatic },
-    	{ name: "FRT_V1_F1", v: 1, f: 1, next: benchmarkStatic },
-    	{ name: "FRT_V2_F1", v: 2, f: 1, next: benchmarkStatic },
-    	{ name: "FRT_V1_F2", v: 1, f: 2, next: benchmarkStatic },
-    	{ name: "FRT_V2_F2", v: 2, f: 2, next: benchmarkCalibrating },
-    	{ name: "RPI_V2_F1", v: 2, f: 1, next: benchmarkCalibrating },
-    	{ name: "RPI_V1_F2", v: 1, f: 2, next: benchmarkCalibrating },
-    	{ name: "RPI_V2_F2", v: 2, f: 2, next: benchmarkEnd }
-    ];
+		var CALIBRATING_BENCHMARK_THRESHOLD_TIME = 0.05;
+		var CALIBRATING_BENCHMARK_STEP_SIZE = 256;
+		var STATIC_BENCHMARK_TIME = 20.0;
+		var staticBenchmarkParticleAmount = 0;
 
-	var CALIBRATING_BENCHMARK_THRESHOLD_TIME = 0.05;
-	var CALIBRATING_BENCHMARK_STEP_SIZE = 256;
-    var STATIC_BENCHMARK_TIME = 20.0;
-    var staticBenchmarkParticleAmount = 0;
+		terminal.addRow("Initializing WebGL ............................");
 
-    terminal.addRow("Initializing WebGL ............................");
+		var gl = initializeWebGL();
 
-	var gl = initializeWebGL();
+		terminal.appendToTop(" done!");
+		terminal.addRow("Initializing benchmarker ......................");
 
-    terminal.setTop("Initializing WebGL ............................ OK!");
-    terminal.addRow("Initializing benchmarker ......................");
+		var benchmarker = new Benchmark.Benchmarker(gl);
 
-    var benchmarker = new Benchmark.Benchmarker(gl);
+		terminal.appendToTop(" done!");
+		terminal.addRow("Press START to start the Cloud Benchmark Suite.");
 
-    terminal.setTop("Initializing benchmarker ...................... OK!");
-    terminal.addRow("Press START to start the Cloud Benchmark Suite.");
+		startButton.style.visibility = "visible";
+		startButton.onmousedown = function () {
+		    startButton.parentNode.removeChild(startButton);
 
-    startButton.style.visibility = "visible";
-    startButton.onmousedown = function () {
-        startButton.parentNode.removeChild(startButton);
-
-        benchmarkCalibrating(reports, settings);
-    };
+		    benchmarkCalibrating(reports, settings);
+		};
+	} catch (e) {
+		alert("Unrecoverable error: " + e);
+	}
 	
 	function benchmarkStatic(reports, settings) {
 		var setting = settings.shift();
@@ -54,7 +58,7 @@ require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyze
         	staticBenchmarkParticleAmount,
         	function (report) {
 
-        		terminal.setTop("Running frame time test {V=" + setting.v + " F=" + setting.f + "} ............. OK!");
+        		terminal.appendToTop(" done!");
         		terminal.addRow("Results: {AVG=" + report.average.toFixed(4)
         			+ " STDEV=" + report.standardDeviation.toFixed(4) + "}.");
 
@@ -76,8 +80,9 @@ require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyze
         	
         		staticBenchmarkParticleAmount = particleAmount;
         		
-        		terminal.setTop("Running relative performance test {V=" + setting.v + " F=" + setting.f + "} ... OK!");
-        		terminal.addRow("Results: {PARTICLES=" + particleAmount + " TIME=" + timeElapsed.toFixed(2) + "}.");
+        		terminal.appendToTop(" done!");
+        		terminal.addRow("Results: {PARTICLES=" + particleAmount
+        			+ " TIME=" + timeElapsed.toFixed(2) + "}.");
 
 		    	reports[setting.name] = { particleAmount: particleAmount, timeElapsed: timeElapsed };
 		    	setting.next(reports, settings);
