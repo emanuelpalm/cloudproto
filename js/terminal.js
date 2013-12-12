@@ -46,6 +46,13 @@ define([], function () {
         }
     };
 
+	/**
+	 * @param {string} text - Text to append to top terminal row.
+	 */
+	Terminal.prototype.appendToTop = function (text) {
+		this.container.childNodes[0].innerHTML += text;
+	};
+
     /**
      * @param {number} index - Index of row to get.
      * @returns {string} Text in acquired row.

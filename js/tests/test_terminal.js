@@ -44,5 +44,8 @@ define(function(require) {
         assert.equal(terminal.getTop(), "X", "Top row contains the text 'X'.");
         terminal.setTop("Z");
         assert.equal(terminal.getTop(), "Z", "Top row contains the text 'Z'.");
+        
+        terminal.appendToTop("J");
+        assert.equal(terminal.getTop(), "ZJ", "Top row contains the text 'ZJ'.");
     });
 });
