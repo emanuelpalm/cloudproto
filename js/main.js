@@ -9,8 +9,8 @@ require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyze
 		var startButton = document.getElementById("startButton");
 		
 		var CALIBRATING_BENCHMARK_THRESHOLD_TIME = 0.05;
-		var CALIBRATING_BENCHMARK_STEP_SIZE = 4096;
-		var STATIC_BENCHMARK_TIME = 2.0;
+		var CALIBRATING_BENCHMARK_STEP_SIZE = 8;
+		var STATIC_BENCHMARK_TIME = 300.0;
 		var staticBenchmarkParticleAmount = 0;
 		
 		var reports = {
