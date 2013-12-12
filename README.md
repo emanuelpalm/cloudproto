@@ -5,6 +5,8 @@ JavaScript context in order to create high amounts of traffic between the WebGL 
 
 The purpose of the prototype is to measure the performance impact of using several mutiplexed VBOs.
 
+Note that running the tests might take quite some time. Be patient.
+
 ### Usage
 The application relies on being run on a web server, and will not funciton properly otherwise. This is due to the
 library relying on XMLHttpRequests, which usage is blocked by most modern browsers when browsing locally.
