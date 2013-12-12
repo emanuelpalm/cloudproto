@@ -8,7 +8,20 @@ require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyze
 		var terminal = new Terminal.Terminal(document.getElementById("terminal"), 16);
 		var startButton = document.getElementById("startButton");
 		
-		var reports = {};
+		var CALIBRATING_BENCHMARK_THRESHOLD_TIME = 0.05;
+		var CALIBRATING_BENCHMARK_STEP_SIZE = 4096;
+		var STATIC_BENCHMARK_TIME = 2.0;
+		var staticBenchmarkParticleAmount = 0;
+		
+		var reports = {
+			global: {
+				userAgent: navigator.userAgent,
+				calibratingBenchmarkThresholdTime: CALIBRATING_BENCHMARK_THRESHOLD_TIME,
+				calibratingBenchmarkStepSize: CALIBRATING_BENCHMARK_STEP_SIZE,
+				staticbenchmarkTime: STATIC_BENCHMARK_TIME
+			}
+		};
+		
 		var settings = [
 			{ name: "RPI_V1_F1", v: 1, f: 1, next: benchmarkStatic },
 			{ name: "FRT_V1_F1", v: 1, f: 1, next: benchmarkStatic },
@@ -19,11 +32,6 @@ require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyze
 			{ name: "RPI_V1_F2", v: 1, f: 2, next: benchmarkCalibrating },
 			{ name: "RPI_V2_F2", v: 2, f: 2, next: benchmarkEnd }
 		];
-
-		var CALIBRATING_BENCHMARK_THRESHOLD_TIME = 0.05;
-		var CALIBRATING_BENCHMARK_STEP_SIZE = 256;
-		var STATIC_BENCHMARK_TIME = 20.0;
-		var staticBenchmarkParticleAmount = 0;
 
 		terminal.addRow("Initializing WebGL ............................");
 
@@ -91,6 +99,7 @@ require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyze
 	
 	function benchmarkEnd(reports, settings) {
         terminal.addRow("All benchmarks successfully performed.");
+        document.getElementById("resultBox").innerHTML = JSON.stringify(reports);
         console.log(reports);
 	}
 

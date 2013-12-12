@@ -50,7 +50,7 @@ canvas {
     margin-top: -1em;
     background-color: #444;
     color: #fff;
-    border:0.1em solid #aaa;
+    border:0.1em solid #888;
     font-weight: bold;
     font-size: 14pt;
     line-height: 2em;
@@ -60,4 +60,19 @@ canvas {
 #startButton:hover {
     background-color: #666;
     cursor: pointer;
+}
+
+#resultBox {
+	position:absolute;
+	bottom: 1em;
+	right: 1em;
+	width: 10%;
+	height: 6%;
+	overflow: auto;
+	color: #777;
+	border:0.1em solid #aaa;
+	background-color: #111;
+	font-size: 11pt;
+	padding: 0.5em;
+	resize: none;
 }
