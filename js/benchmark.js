@@ -9,6 +9,9 @@ define(["webgl", "utilities", "cloud", "analyzer", "programs"],
          */
 		function Benchmarker(gl) {
 		
+			var PARTICLE_MAX_INITIAL = 1048576;
+            var THRESHOLD_STREAK_GOAL = 60;
+		
 			var cloudProgram = new Programs.Cloud(gl,
 				Utilities.GET("resources/particle.vert"),
 				Utilities.GET("resources/particle.frag")
@@ -19,17 +22,17 @@ define(["webgl", "utilities", "cloud", "analyzer", "programs"],
 				Utilities.GET("resources/post.frag")
 			);
 
-            var particleMax = 1048576;
+			var particleMax = PARTICLE_MAX_INITIAL;
 			var cloud = new Cloud.Cloud(0, particleMax);
 
             /**
              * Run benchmark.
              *
-             * @param {function} callback - Callback to fire with AnalyzerReport when benchmark is over.
              * @param {number} runTime - Time, in seconds, to run benchmark.
              * @param {number} particleAmount - Amount of particles in cloud during benchmark.
+             * @param {function} callback - Callback to fire with AnalyzerReport when benchmark is over.
              */
-			this.runStatic = function (callback, runTime, particleAmount) {
+			this.runStatic = function (runTime, particleAmount, callback) {
 
                 var analyzer = new Analyzer.Analyzer();
                 cloud.setParticleAmount(particleAmount);
@@ -61,30 +64,29 @@ define(["webgl", "utilities", "cloud", "analyzer", "programs"],
             /**
              * Increases particle amount until the frame rendering time passes a given threshold time.
              *
-             * @param {function} callback - Callback fired with particle amount and time elapsed on convergence.
              * @param {number} thresholdTime - Frame rendering time, in seconds, to converge at.
              * @param {number} stepSize - The amount of particles added each time the threshold is not reached.
+             * @param {function} callback - Callback fired with particle amount and time elapsed on convergence.
              */
-            this.runCalibrating = function (callback, thresholdTime, stepSize) {
+            this.runCalibrating = function (thresholdTime, stepSize, callback) {
 
                 var clock = new Utilities.Clock();
                 cloud.setParticleAmount(stepSize);
 
                 var particleAmount = 0;
-                var thresholdStreak = 0;
+                var thresholdPassedStreak = 0;
 
                 (function tick() {
 
                     if (clock.getInterval() > thresholdTime) {
-                        thresholdStreak++;
+                        thresholdPassedStreak++;
 
                     } else {
-                        particleAmount += stepSize;
-                        cloud.setParticleAmount(particleAmount);
-                        thresholdStreak = 0;
+                        increaseParticleAmountWith(stepSize);
+                        thresholdPassedStreak = 0;
                     }
 
-                    if (thresholdStreak >= 60) {
+                    if (thresholdPassedStreak >= THRESHOLD_STREAK_GOAL) {
                         callback(particleAmount, clock.getTimeElapsed());
 
                     } else {
@@ -98,6 +100,18 @@ define(["webgl", "utilities", "cloud", "analyzer", "programs"],
                     }
 
                 })();
+
+				function increaseParticleAmountWith(amount) {
+                    particleAmount += amount;
+                    
+                    if (particleAmount > particleMax) {
+                    	particleMax *= 2;
+                    	cloud = new Cloud.Cloud(particleAmount, particleMax);
+
+                    } else {
+                    	cloud.setParticleAmount(particleAmount);
+                    }
+				}
 
             };
 

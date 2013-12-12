@@ -6,114 +6,87 @@ require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyze
 
     var terminal = new Terminal.Terminal(document.getElementById("terminal"), 16);
     var startButton = document.getElementById("startButton");
-    var frameTimeReports = [];
-    var relativePerformanceReports = [];
+    
+    var reports = {};
+    var settings = [
+    	{ name: "RPI_V1_F1", v: 1, f: 1, next: benchmarkStatic },
+    	{ name: "FRT_V1_F1", v: 1, f: 1, next: benchmarkStatic },
+    	{ name: "FRT_V2_F1", v: 2, f: 1, next: benchmarkStatic },
+    	{ name: "FRT_V1_F2", v: 1, f: 2, next: benchmarkStatic },
+    	{ name: "FRT_V2_F2", v: 2, f: 2, next: benchmarkCalibrating },
+    	{ name: "RPI_V2_F1", v: 2, f: 1, next: benchmarkCalibrating },
+    	{ name: "RPI_V1_F2", v: 1, f: 2, next: benchmarkCalibrating },
+    	{ name: "RPI_V2_F2", v: 2, f: 2, next: benchmarkEnd }
+    ];
 
+	var CALIBRATING_BENCHMARK_THRESHOLD_TIME = 0.05;
+	var CALIBRATING_BENCHMARK_STEP_SIZE = 256;
     var STATIC_BENCHMARK_TIME = 20.0;
     var staticBenchmarkParticleAmount = 0;
 
-    terminal.addRow("Initializing WebGL ..................");
+    terminal.addRow("Initializing WebGL ............................");
 
 	var gl = initializeWebGL();
 
-    terminal.setTop("Initializing WebGL .................. done!");
-    terminal.addRow("Initializing benchmarker ............");
+    terminal.setTop("Initializing WebGL ............................ OK!");
+    terminal.addRow("Initializing benchmarker ......................");
 
     var benchmarker = new Benchmark.Benchmarker(gl);
 
-    terminal.setTop("Initializing benchmarker ............ done!");
+    terminal.setTop("Initializing benchmarker ...................... OK!");
     terminal.addRow("Press START to start the Cloud Benchmark Suite.");
 
     startButton.style.visibility = "visible";
     startButton.onmousedown = function () {
         startButton.parentNode.removeChild(startButton);
 
-        benchmark0();
+        benchmarkCalibrating(reports, settings);
     };
+	
+	function benchmarkStatic(reports, settings) {
+		var setting = settings.shift();
+		
+        terminal.addRow("Running frame time test {V=" + setting.v + " F=" + setting.f + "} ............. ");
+        benchmarker.setVBON(setting.v);
+        benchmarker.setFBOTextureN(setting.f);
+        benchmarker.runStatic(
+        	STATIC_BENCHMARK_TIME,
+        	staticBenchmarkParticleAmount,
+        	function (report) {
 
-    function benchmark0() {
-        terminal.addRow("Running cloud calibration ...........");
-        benchmarker.setVBON(1);
-        benchmarker.setFBOTextureN(1);
-        benchmarker.runCalibrating(benchmark0done, 0.10, 1024);
-    }
+        		terminal.setTop("Running frame time test {V=" + setting.v + " F=" + setting.f + "} ............. OK!");
+        		terminal.addRow("Results: {AVG=" + report.average.toFixed(4)
+        			+ " STDEV=" + report.standardDeviation.toFixed(4) + "}.");
 
-    function benchmark0done(particleAmount, time) {
-        terminal.setTop("Running cloud calibration ........... done!");
-        terminal.addRow("Calibration took " + time.toFixed(2) + " seconds.");
-        terminal.addRow("Calibration converged at " + particleAmount + " cloud particles.");
-        relativePerformanceReports.push(particleAmount);
+		    	reports[setting.name] = report;
+		    	setting.next(reports, settings);
+		    });
+	}
+	
+	function benchmarkCalibrating(reports, settings) {
+		var setting = settings.shift();
+		
+        terminal.addRow("Running relative performance test {V=" + setting.v + " F=" + setting.f + "} ... ");
+        benchmarker.setVBON(setting.v);
+        benchmarker.setFBOTextureN(setting.f);
+        benchmarker.runCalibrating(
+        	CALIBRATING_BENCHMARK_THRESHOLD_TIME,
+        	CALIBRATING_BENCHMARK_STEP_SIZE,
+        	function (particleAmount, timeElapsed) {
+        	
+        		staticBenchmarkParticleAmount = particleAmount;
+        		
+        		terminal.setTop("Running relative performance test {V=" + setting.v + " F=" + setting.f + "} ... OK!");
+        		terminal.addRow("Results: {PARTICLES=" + particleAmount + " TIME=" + timeElapsed.toFixed(2) + "}.");
 
-        staticBenchmarkParticleAmount = particleAmount;
-        benchmark1();
-    }
-
-    function benchmark1() {
-        terminal.addRow("Running frame time test {V=1 F=1} ... ");
-        benchmarker.setVBON(1);
-        benchmarker.setFBOTextureN(1);
-        benchmarker.runStatic(benchmark1done, STATIC_BENCHMARK_TIME, staticBenchmarkParticleAmount);
-    }
-
-    function benchmark1done(report) {
-        terminal.setTop("Running frame time test {V=1 F=1} ... done!");
-        terminal.addRow("Frame time average was " + report.average.toFixed(4) + ".");
-        terminal.addRow("Frame time standard deviation was " + report.standardDeviation.toFixed(4) + ".");
-        frameTimeReports.push(report);
-
-        benchmark2();
-    }
-
-    function benchmark2() {
-        terminal.addRow("Running frame time test {V=2 F=1} ... ");
-        benchmarker.setVBON(2);
-        benchmarker.setFBOTextureN(1);
-        benchmarker.runStatic(benchmark2done, STATIC_BENCHMARK_TIME, staticBenchmarkParticleAmount);
-    }
-
-    function benchmark2done(report) {
-        terminal.setTop("Running frame time test {V=2 F=1} ... done!");
-        terminal.addRow("Frame time average was " + report.average.toFixed(4) + ".");
-        terminal.addRow("Frame time standard deviation was " + report.standardDeviation.toFixed(4) + ".");
-        frameTimeReports.push(report);
-
-        benchmark3();
-    }
-
-    function benchmark3() {
-        terminal.addRow("Running frame time test {V=1 F=2} ... ");
-        benchmarker.setVBON(1);
-        benchmarker.setFBOTextureN(2);
-        benchmarker.runStatic(benchmark3done, STATIC_BENCHMARK_TIME, staticBenchmarkParticleAmount);
-    }
-
-    function benchmark3done(report) {
-        terminal.setTop("Running frame time test {V=1 F=2} ... done!");
-        terminal.addRow("Frame time average was " + report.average.toFixed(4) + ".");
-        terminal.addRow("Frame time standard deviation was " + report.standardDeviation.toFixed(4) + ".");
-        frameTimeReports.push(report);
-
-        benchmark4();
-    }
-
-    function benchmark4() {
-        terminal.addRow("Running frame time test {V=2 F=2} ... ");
-        benchmarker.setVBON(2);
-        benchmarker.setFBOTextureN(2);
-        benchmarker.runStatic(benchmark4done, STATIC_BENCHMARK_TIME, staticBenchmarkParticleAmount);
-    }
-
-    function benchmark4done(report) {
-        terminal.setTop("Running frame time test {V=2 F=2} ... done!");
-        terminal.addRow("Frame time average was " + report.average.toFixed(4) + ".");
-        terminal.addRow("Frame time standard deviation was " + report.standardDeviation.toFixed(4) + ".");
-        frameTimeReports.push(report);
-
-        benchmarkEnd();
-    }
-
-	function benchmarkEnd() {
+		    	reports[setting.name] = { particleAmount: particleAmount, timeElapsed: timeElapsed };
+		    	setting.next(reports, settings);
+		    });
+	}
+	
+	function benchmarkEnd(reports, settings) {
         terminal.addRow("All benchmarks successfully performed.");
+        console.log(reports);
 	}
 
 	function initializeWebGL() {
