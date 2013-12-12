@@ -5,7 +5,7 @@ require.config({
 require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyzer, Benchmark, Terminal) {
 	
 	try {
-		var terminal = new Terminal.Terminal(document.getElementById("terminal"), 16);
+		var terminal = new Terminal.Terminal(document.getElementById("terminal"), 8);
 		var startButton = document.getElementById("startButton");
 		
 		var CALIBRATING_BENCHMARK_THRESHOLD_TIME = 0.05;
@@ -49,6 +49,7 @@ require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyze
 		startButton.onmousedown = function () {
 		    startButton.parentNode.removeChild(startButton);
 
+			terminal.addRow("Starting Cloud benchmark suite. This may take a while ...");
 		    benchmarkCalibrating(reports, settings);
 		};
 	} catch (e) {
