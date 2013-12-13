@@ -6,8 +6,6 @@ varying vec4 v_Color;
 // Calculates alpha transparency of gl.POINT, making it a smooth circle.
 float calculatePlanetAlpha();
 
-
-
 void main() {
 
 	const vec3 lightOrigin = vec3(0.0);
@@ -17,7 +15,6 @@ void main() {
 	vec3 planetNormal = normalize(vec3((gl_PointCoord - vec2(0.5)) * 2.0, cos((gl_PointCoord.x - 0.5) * 2.0)));
 	
 	vec3 color = lightColor * v_Color.rgb * dot(lightDirection, planetNormal);
-	//vec3 color = v_Color.rgb;
 	
 	const float MAXITERATIONS = 100.0;
 	const float LIMIT = 5.0;
