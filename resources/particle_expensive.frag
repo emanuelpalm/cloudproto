@@ -1,4 +1,4 @@
-precision highp float;
+precision lowp float;
 
 varying vec4 v_Position;
 varying vec4 v_Color;
@@ -17,13 +17,14 @@ void main() {
 	vec3 planetNormal = normalize(vec3((gl_PointCoord - vec2(0.5)) * 2.0, cos((gl_PointCoord.x - 0.5) * 2.0)));
 	
 	vec3 color = lightColor * v_Color.rgb * dot(lightDirection, planetNormal);
+	//vec3 color = v_Color.rgb;
 	
 	const float MAXITERATIONS = 100.0;
 	const float LIMIT = 5.0;
 	const float INCREMENT = 0.8;
 	
-	float x0 = gl_PointCoord.x * 0.0001 + 0.317;
-	float y0 = gl_PointCoord.y * 0.0001 + 0.495;
+	float x0 = gl_PointCoord.x * 0.01 + 0.317;
+	float y0 = gl_PointCoord.y * 0.01 + 0.495;
 	float x;
 	float y;
 	float count = 0.0;
@@ -47,3 +48,4 @@ float calculatePlanetAlpha() {
 	float distanceFromCenter = distance(gl_PointCoord, POINT_CENTER);
 	return smoothstep(0.50, 0.45, distanceFromCenter);
 }
+
