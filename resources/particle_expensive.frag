@@ -6,6 +6,8 @@ varying vec4 v_Color;
 // Calculates alpha transparency of gl.POINT, making it a smooth circle.
 float calculatePlanetAlpha();
 
+
+
 void main() {
 
 	const vec3 lightOrigin = vec3(0.0);
@@ -37,7 +39,7 @@ void main() {
 		count += INCREMENT;
 	}
 	
-    gl_FragColor = vec4(color, calculatePlanetAlpha() * v_Color.a);
+    gl_FragColor = vec4(color * count / MAXITERATIONS, calculatePlanetAlpha() * v_Color.a);
 }
 
 #define POINT_CENTER vec2(0.5)
