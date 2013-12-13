@@ -5,16 +5,17 @@ define(["webgl", "utilities", "cloud", "analyzer", "programs"],
          * Creates a new benchmark program.
          *
          * @param {WebGLObject} gl - WebGL context.
+         * @param {string} program - Cloud program string identifier.
          * @constructor
          */
-		function Benchmarker(gl) {
+		function Benchmarker(gl, program) {
 		
-			var PARTICLE_MAX_INITIAL = 1048576;
+			var PARTICLE_MAX_INITIAL = 524288;
             var THRESHOLD_STREAK_GOAL = 60;
-		
+
 			var cloudProgram = new Programs.Cloud(gl,
-				Utilities.GET("resources/particle_cheap.vert"),
-				Utilities.GET("resources/particle_cheap.frag")
+				Utilities.GET("resources/particle_" + program + ".vert"),
+				Utilities.GET("resources/particle_" + program + ".frag")
 			);
 
 			var postProgram = new Programs.Post(gl,

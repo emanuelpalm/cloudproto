@@ -38,16 +38,9 @@ canvas {
     opacity: 1.0;
 }
 
-#startButton {
-    visibility: hidden;
-    font-family: Monaco, "Lucida Console", monospace;
-    position: absolute;
-    top: 50%;
-    left: 50%;
+#startButton, #programButton {
     width: 8em;
     height: 2em;
-    margin-left: -4em;
-    margin-top: -1em;
     background-color: #444;
     color: #fff;
     border:0.1em solid #888;
@@ -57,9 +50,74 @@ canvas {
     text-align: center;
 }
 
-#startButton:hover {
+#programButton {
+	margin-top: 2em;
+    width: 100%;
+}
+
+#startButton {
+	font-family: Monaco, "Lucida Console", monospace;
+	visibility: hidden;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -4em;
+    margin-top: -1em;
+}
+
+#startButton:hover, #programButton:hover {
     background-color: #666;
     cursor: pointer;
+}
+
+#programForm {
+	visibility: hidden;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+#programForm form {
+	font-family: Monaco, "Lucida Console", monospace;
+	background-color: #333;
+	border:0.1em solid #aaa;
+	color: #fff;
+	margin: 4em auto;
+	padding: 1em;
+	min-width: 22em;
+	max-width: 26em;
+}
+
+#programForm form h1 {
+	margin: 0 0 0.4em 0;
+	padding: 0;
+}
+
+#programForm form .group {
+	margin-bottom: 1em;
+}
+
+
+#programForm form .group b {
+	display: block;
+	margin-left: 1em;
+}
+
+#programForm form .group div {
+	margin: 0.4em 0 0 2em;
+	font-size: 0.8em;
+}
+
+#programForm form .group input, #programForm form .group select {
+	margin-left: 2em;
+	font-size: 0.8em;
+	width: 20em;
+	padding: 0.2em;
+	color: #fff;
+	border:0.1em solid #aaa;
+	background-color: #111;
 }
 
 #resultBox {
