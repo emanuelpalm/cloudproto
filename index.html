@@ -9,6 +9,20 @@
 <body>
     <canvas id="webgl-canvas"></canvas>
     <div id="terminal"></div>
+    <div id="programForm">
+    	<form name="programForm">
+    		<div class="group">
+    			<b>Calibrating particle-amount benchmarks</b>
+    			<div>Threshold time, in seconds</div> <input type="text" name="calibratingBenchmarkThresholdTime" value="0.05">
+    			<div>Step size, in particles</div> <input type="text" name="calibratingBenchmarkStepSize" value="8">
+    		</div>
+    		<div class="group">
+    			<b>Static particle-amount benchmarks</b>
+    			<div>Time, in seconds</div> <input type="text" name="staticBenchmarkTime" value="300.0">
+    		</div>
+    	</form>
+    	<div id="programButton">Confirm</div>
+    </div>
     <div id="startButton">Start</div>
     <textarea readonly onclick="this.select(); this.focus();" id="resultBox"></textarea>
 </body>
