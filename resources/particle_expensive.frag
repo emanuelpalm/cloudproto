@@ -16,7 +16,7 @@ void main() {
 	
 	vec3 color = lightColor * v_Color.rgb * dot(lightDirection, planetNormal);
 	
-    gl_FragColor = vec4(color, calculatePlanetAlpha() * 0.125);
+    gl_FragColor = vec4(color, calculatePlanetAlpha() * 0.0625);
 }
 
 #define POINT_CENTER vec2(0.5)
