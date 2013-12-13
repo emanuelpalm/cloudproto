@@ -13,8 +13,8 @@ define(["webgl", "utilities", "cloud", "analyzer", "programs"],
             var THRESHOLD_STREAK_GOAL = 60;
 		
 			var cloudProgram = new Programs.Cloud(gl,
-				Utilities.GET("resources/particle.vert"),
-				Utilities.GET("resources/particle.frag")
+				Utilities.GET("resources/particle_cheap.vert"),
+				Utilities.GET("resources/particle_cheap.frag")
 			);
 
 			var postProgram = new Programs.Post(gl,
