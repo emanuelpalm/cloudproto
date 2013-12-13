@@ -18,7 +18,7 @@ void main() {
 	
 	vec3 color = lightColor * v_Color.rgb * dot(lightDirection, planetNormal);
 	
-	const float MAXITERATIONS = 250.0;
+	const float MAXITERATIONS = 100.0;
 	const float LIMIT = 5.0;
 	const float INCREMENT = 0.8;
 	

@@ -97,7 +97,7 @@ define([], function() {
             0.4 + 0.3 * Math.random(),
             0.2 + 0.1 * Math.random(),
             0.2 + 0.8 * Math.random(),
-            0.1 + 0.3 * Math.random()
+            0.3 + 0.3 * Math.random()
         );
         this.setPosition(0, 0, 0);
     }
