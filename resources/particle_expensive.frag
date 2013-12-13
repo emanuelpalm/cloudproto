@@ -16,6 +16,27 @@ void main() {
 	
 	vec3 color = lightColor * v_Color.rgb * dot(lightDirection, planetNormal);
 	
+	const float MAXITERATIONS = 50.0;
+	const float LIMIT = 5.0;
+	const float INCREMENT = 0.8;
+	
+	float x0 = gl_PointCoord.x * 0.0001 + 0.317;
+	float y0 = gl_PointCoord.y * 0.0001 + 0.495;
+	float x;
+	float y;
+	float count = 0.0;
+	
+	for (float i = 0.0; i < MAXITERATIONS; i += INCREMENT) {
+		
+		if (distance(x, y) > LIMIT)
+			break;
+		
+		float xTemp = pow(x, 2.0) - pow(y, 2.0);
+		y = (2.0 * x * y) + y0;
+		x = xTemp + x0;
+		count += INCREMENT;
+	}
+	
     gl_FragColor = vec4(color, calculatePlanetAlpha() * v_Color.a);
 }
 
