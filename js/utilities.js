@@ -56,6 +56,70 @@ define([], function () {
             return (t() - timeStart) / 1000;
         }
     }
+    
+    /**
+     * Collects sampled average intervals.
+     *
+     * @constructor
+     * @param {number} sampleAmount - The amount of samples to base the average intervals on.
+     * @param {function} [t=performance.now] - Function for acquiring current time, in ms.
+     */
+    function AverageIntervalClock(sampleAmount, t) {
+        
+        var clock = new Clock(t);
+        var sampler = new Sampler(sampleAmount);
+        
+        /**
+         * Acquire average time elapsed, in seconds, since last call of this method.
+         *
+         * The average time is calculated from the last n samples, as given when instantiating
+         * class. In case n samples have not been collected, the average is calculated from the
+         * amount of avaliable samples.
+         *
+         * @returns {number} Interval time in seconds.
+         */
+        this.getAverageInterval = function () {
+            sampler.push(clock.getInterval());
+            return sampler.getAverage();
+        }
+        
+        /**
+         * @returns {number} Amount of intervals measured.
+         */
+        this.getIntervalCount = function () {
+            return sampler.getSampleCount();
+        }
+        
+        /**
+         * @returns {number} Time, in seconds, since the AverageIntervalClock was instantiated.
+         */
+        this.getTimeElapsed = clock.getTimeElapsed;
+        
+        function Sampler(sampleAmount) {
+            if (!sampleAmount)
+                sampleAmount = 10;
+
+            var samples = new Array(sampleAmount);
+            var sampleIterator = 0;
+            var sampleCount = 0;
+            
+            this.push = function(sample) {
+                sampleCount++;
+                samples[sampleIterator] = sample;
+                sampleIterator = (sampleIterator + 1) % sampleAmount;
+            }
+            
+            this.getSampleCount = function () {
+                return sampleCount;
+            }
+            
+            this.getAverage = function () {
+                return samples.reduce(function (acc, elem) {
+                    return acc + elem;
+                }, 0) / Math.min(sampleCount, sampleAmount);
+            }
+        }
+    }
 
     // Ensure performance.now() is a valid function.
     window.performance = window.performance || {};
@@ -94,6 +158,7 @@ define([], function () {
 
     return {
         GET: GET,
-        Clock: Clock
+        Clock: Clock,
+        AverageIntervalClock: AverageIntervalClock
     };
 });
