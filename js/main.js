@@ -13,10 +13,9 @@ require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyze
 		
 		var conf = {
 			programIdentifier: "cheap",
-			calibratingBenchmarkThresholdTime: 0.05,
-			calibratingBenchmarkStepSize: 8,
-			staticBenchmarkTime: 300.0,
-			staticBenchmarkParticleAmount: 0
+			targetThresholdTime: 0.05,
+			duration: 100.0,
+			particleAmount: 0
 		}
 		
 		var reports = {};
@@ -26,10 +25,7 @@ require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyze
 			{ name: "FRT_V1_F1", v: 1, f: 1, next: benchmarkStatic },
 			{ name: "FRT_V2_F1", v: 2, f: 1, next: benchmarkStatic },
 			{ name: "FRT_V1_F2", v: 1, f: 2, next: benchmarkStatic },
-			{ name: "FRT_V2_F2", v: 2, f: 2, next: benchmarkCalibrating },
-			{ name: "RPI_V2_F1", v: 2, f: 1, next: benchmarkCalibrating },
-			{ name: "RPI_V1_F2", v: 1, f: 2, next: benchmarkCalibrating },
-			{ name: "RPI_V2_F2", v: 2, f: 2, next: benchmarkEnd }
+			{ name: "FRT_V2_F2", v: 2, f: 2, next: benchmarkEnd }
 		];
 
 		terminal.addRow("Initializing WebGL ............................");
@@ -68,9 +64,8 @@ require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyze
 				
 				function collectConfigurationDataFrom(form) {
 					conf.programIdentifier = form.programToRun.value;
-					conf.calibratingBenchmarkThresholdTime = parseFloat(form.calibratingBenchmarkThresholdTime.value);
-					conf.calibratingBenchmarkStepSize = parseInt(form.calibratingBenchmarkStepSize.value);
-					conf.staticBenchmarkTime = parseFloat(form.staticBenchmarkTime.value);
+					conf.targetThresholdTime = parseFloat(form.targetThresholdTime.value);
+					conf.duration = parseFloat(form.duration.value);
 				}
 			}, 250);
 
@@ -101,8 +96,8 @@ require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyze
         benchmarker.setVBON(s.v);
         benchmarker.setFBOTextureN(s.f);
         benchmarker.runStatic(
-        	conf.staticBenchmarkTime,
-        	conf.staticBenchmarkParticleAmount,
+        	conf.duration,
+        	conf.particleAmount,
         	function (report) {
 
         		terminal.appendToTop(" done!");
@@ -120,16 +115,20 @@ require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyze
         benchmarker.setVBON(s.v);
         benchmarker.setFBOTextureN(s.f);
         benchmarker.runCalibrating(
-        	conf.calibratingBenchmarkThresholdTime,
-        	conf.calibratingBenchmarkStepSize,
-        	function (particleAmount, timeElapsed) {
+        	conf.targetThresholdTime,
+        	function (particleAmount, averageInterval, intervalCount, timeElapsed) {
         	
-        		conf.staticBenchmarkParticleAmount = particleAmount;
+        		conf.particleAmount = particleAmount;
         		
         		terminal.appendToTop(" done!");
-        		terminal.addRow("Results: {PARTICLES=" + particleAmount + " TIME=" + timeElapsed.toFixed(2) + "}.");
+        		terminal.addRow("Results: {AVG=" + averageInterval.toFixed(4) + " PARTICLES=" + particleAmount + "}.");
 
-		    	reports[s.name] = { particleAmount: particleAmount, timeElapsed: timeElapsed };
+		    	reports[s.name] = {
+		    	    particleAmount: particleAmount,
+		    	    averageInterval: averageInterval,
+		    	    intervalCount: intervalCount,
+		    	    timeElapsed: timeElapsed
+		    	};
 		    	s.next(reports, schedule);
 		    });
 	}
@@ -142,9 +141,8 @@ require(["webgl", "analyzer", "benchmark", "terminal"], function (WebGL, Analyze
 	function logResults(reports) {
         reports.global = {
 			userAgent: navigator.userAgent,
-			calibratingBenchmarkThresholdTime: conf.calibratingBenchmarkThresholdTime,
-			calibratingBenchmarkStepSize: conf.calibratingBenchmarkStepSize,
-			staticbenchmarkTime: conf.staticBenchmarkTime
+			targetThresholdTime: conf.targetThresholdTime,
+			duration: conf.duration
 		};
         document.getElementById("resultBox").innerHTML = JSON.stringify(reports);
 	}

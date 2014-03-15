@@ -11,7 +11,6 @@ define(["webgl", "utilities", "cloud", "analyzer", "programs"],
 		function Benchmarker(gl, program) {
 		
 			var PARTICLE_MAX_INITIAL = 524288;
-            var THRESHOLD_STREAK_GOAL = 60;
 
 			var cloudProgram = new Programs.Cloud(gl,
 				Utilities.GET("resources/particle_" + program + ".vert"),
@@ -69,38 +68,68 @@ define(["webgl", "utilities", "cloud", "analyzer", "programs"],
              * @param {number} stepSize - The amount of particles added each time the threshold is not reached.
              * @param {function} callback - Callback fired with particle amount and time elapsed on convergence.
              */
-            this.runCalibrating = function (thresholdTime, stepSize, callback) {
+            this.runCalibrating = function (thresholdTime, callback) {
 
-                var clock = new Utilities.Clock();
-                cloud.setParticleAmount(stepSize);
+                console.log(thresholdTime);
 
-                var particleAmount = 0;
-                var thresholdPassedStreak = 0;
+                var clock = new Utilities.AverageIntervalClock(60);
+                var particleAmount = 32;
+                
+                cloud.setParticleAmount(particleAmount);
 
                 (function tick() {
 
-                    if (clock.getInterval() > thresholdTime) {
-                        thresholdPassedStreak++;
+                    var averageInterval = clock.getAverageInterval();
 
+                    if (averageInterval > thresholdTime + 0.025) {
+                        decreaseParticleAmountWith(64);
+                    
+                    } else if (averageInterval > thresholdTime + 0.005) {
+                        decreaseParticleAmountWith(32);
+                
+                    } else if (averageInterval > thresholdTime + 0.0005) {
+                        decreaseParticleAmountWith(16);
+                
+                    } else if (averageInterval > thresholdTime + 0.00025) {
+                        decreaseParticleAmountWith(8);
+
+                    } else if (averageInterval < thresholdTime - 0.025) {
+                        increaseParticleAmountWith(64);
+
+                    } else if (averageInterval < thresholdTime - 0.005) {
+                        increaseParticleAmountWith(32);
+
+                    } else if (averageInterval < thresholdTime - 0.0005) {
+                        increaseParticleAmountWith(16);
+
+                    } else if (averageInterval < thresholdTime - 0.00025) {
+                        increaseParticleAmountWith(8);
+                        
                     } else {
-                        increaseParticleAmountWith(stepSize);
-                        thresholdPassedStreak = 0;
+                        var intervalCount = clock.getIntervalCount();
+                        if (intervalCount > 180) {
+                            callback(particleAmount, averageInterval, intervalCount, clock.getTimeElapsed());
+                            return;
+                        }
                     }
+                    
+                    requestAnimationFrame(tick);
 
-                    if (thresholdPassedStreak >= THRESHOLD_STREAK_GOAL) {
-                        callback(particleAmount, clock.getTimeElapsed());
+                    cloud.update(clock.getTimeElapsed());
 
-                    } else {
-                        requestAnimationFrame(tick);
-
-                        cloud.update(clock.getTimeElapsed());
-
-                        postProgram.render(function () {
-                            cloudProgram.render(cloud);
-                        });
-                    }
+                    postProgram.render(function () {
+                        cloudProgram.render(cloud);
+                    });
 
                 })();
+
+                function decreaseParticleAmountWith(amount) {
+                    particleAmount -= amount;
+                    if (particleAmount < 0) {
+                        particleAmount = 0;
+                    }
+                    cloud.setParticleAmount(particleAmount);
+                }
 
 				function increaseParticleAmountWith(amount) {
                     particleAmount += amount;
