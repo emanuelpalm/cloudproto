@@ -42,22 +42,22 @@ define([], function () {
      * @constructor
      * @param {number[]} items - Numerical values to generate report for.
      *
-     * @property {number[]} items - The items accounted for.
+     * @property {number} samples - The amount of items accounted for.
      * @property {number} sum - The sum of all items.
      * @property {number} average - The average value of all items.
      * @property {number} standardDeviation - The standard deviation calculated from all items.
      */
     function AnalyzerReport(items) {
-        this.items = items;
+        this.samples = items.length;
 
         this.sum = (function (items) {
             return items.reduce(function (acc, elem) {
                 return acc + elem;
             }, 0);
-        })(this.items);
+        })(items);
 
-        this.average = (this.items.length)
-            ? this.sum / this.items.length
+        this.average = (items.length)
+            ? this.sum / items.length
             : 0.0;
 
         this.standardDeviation = (function (items, average) {
@@ -74,7 +74,7 @@ define([], function () {
             }, 0);
 
             return Math.sqrt(sumOfDeviations / items.length);
-        })(this.items, this.average);
+        })(items, this.average);
     }
 
     return {
