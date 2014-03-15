@@ -72,7 +72,7 @@ define(["webgl", "utilities", "cloud", "analyzer", "programs"],
 
                 console.log(thresholdTime);
 
-                var clock = new Utilities.AverageIntervalClock(60);
+                var clock = new Utilities.AverageIntervalClock(32);
                 var particleAmount = 32;
                 
                 cloud.setParticleAmount(particleAmount);
@@ -85,29 +85,29 @@ define(["webgl", "utilities", "cloud", "analyzer", "programs"],
                         decreaseParticleAmountWith(64);
                     
                     } else if (averageInterval > thresholdTime + 0.005) {
-                        decreaseParticleAmountWith(32);
-                
-                    } else if (averageInterval > thresholdTime + 0.0005) {
                         decreaseParticleAmountWith(16);
                 
+                    } else if (averageInterval > thresholdTime + 0.0005) {
+                        decreaseParticleAmountWith(4);
+                
                     } else if (averageInterval > thresholdTime + 0.00025) {
-                        decreaseParticleAmountWith(8);
+                        decreaseParticleAmountWith(1);
 
                     } else if (averageInterval < thresholdTime - 0.025) {
                         increaseParticleAmountWith(64);
 
                     } else if (averageInterval < thresholdTime - 0.005) {
-                        increaseParticleAmountWith(32);
-
-                    } else if (averageInterval < thresholdTime - 0.0005) {
                         increaseParticleAmountWith(16);
 
+                    } else if (averageInterval < thresholdTime - 0.0005) {
+                        increaseParticleAmountWith(4);
+
                     } else if (averageInterval < thresholdTime - 0.00025) {
-                        increaseParticleAmountWith(8);
+                        increaseParticleAmountWith(1);
                         
                     } else {
                         var intervalCount = clock.getIntervalCount();
-                        if (intervalCount > 180) {
+                        if (intervalCount > 180 && particleAmount > 0) {
                             callback(particleAmount, averageInterval, intervalCount, clock.getTimeElapsed());
                             return;
                         }
